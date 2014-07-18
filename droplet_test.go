@@ -60,6 +60,7 @@ func (s *S) Test_RetrieveDroplet(c *C) {
 	c.Assert(droplet.StringId(), Equals, "25")
 	c.Assert(droplet.RegionSlug(), Equals, "nyc1")
 	c.Assert(droplet.IsLocked(), Equals, "false")
+	c.Assert(droplet.NetworkingType(), Equals, "public")
 }
 
 func (s *S) Test_DestroyDroplet(c *C) {
@@ -119,6 +120,22 @@ var dropletExample = `{
     "locked": false,
     "status": "new",
     "networks": {
+      "v4": [
+        {
+          "ip_address": "127.0.0.20",
+          "netmask": "255.255.255.0",
+          "gateway": "127.0.0.21",
+          "type": "public"
+        }
+      ],
+      "v6": [
+        {
+          "ip_address": "2001::14",
+          "cidr": 124,
+          "gateway": "2400:6180:0000:00D0:0000:0000:0009:7000",
+          "type": "public"
+        }
+      ]
     },
     "kernel": {
       "id": 485432972,

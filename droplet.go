@@ -13,14 +13,14 @@ type DropletResponse struct {
 // Droplet is used to represent a retrieved Droplet. All properties
 // are set as strings.
 type Droplet struct {
-	Id       int64                                  `json:"id"`
-	Name     string                                 `json:"name"`
-	Region   map[string]interface{}                 `json:"region"`
-	Image    map[string]interface{}                 `json:"image"`
-	Size     map[string]interface{}                 `json:"size"`
-	Locked   bool                                   `json:"locked"`
-	Status   string                                 `json:"status"`
-	Networks map[string]map[interface{}]interface{} `json:"networks"`
+	Id       int64                               `json:"id"`
+	Name     string                              `json:"name"`
+	Region   map[string]interface{}              `json:"region"`
+	Image    map[string]interface{}              `json:"image"`
+	Size     map[string]interface{}              `json:"size"`
+	Locked   bool                                `json:"locked"`
+	Status   string                              `json:"status"`
+	Networks map[string][]map[string]interface{} `json:"networks"`
 }
 
 // Returns the slug for the region
@@ -54,19 +54,30 @@ func (d *Droplet) SizeSlug() string {
 
 // Returns the ipv4 address
 func (d *Droplet) IPV4Address() string {
-	return d.Networks["ipv4"]["ip_address"].(string)
+	if _, ok := d.Networks["v4"]; ok {
+		return d.Networks["v4"][0]["ip_address"].(string)
+	}
+
+	return ""
 }
 
 // Returns the ipv6 adddress
 func (d *Droplet) IPV6Address() string {
-	return d.Networks["ipv6"]["ip_address"].(string)
+	if _, ok := d.Networks["v6"]; ok {
+		return d.Networks["v6"][0]["ip_address"].(string)
+	}
+
+	return ""
 }
 
 // Currently DO only has a network type per droplet,
 // so we just takes ipv4s
 func (d *Droplet) NetworkingType() string {
-	return d.Networks["ipv4"]["type"].(string)
+	if _, ok := d.Networks["v4"]; ok {
+		return d.Networks["v4"][0]["type"].(string)
+	}
 
+	return ""
 }
 
 // CreateDroplet contains the request parameters to create a new
@@ -139,7 +150,7 @@ func (c *Client) CreateDroplet(opts *CreateDroplet) (string, error) {
 	}
 
 	// The request was successful
-	return string(droplet.Droplet.StringId()), nil
+	return droplet.Droplet.StringId(), nil
 }
 
 // DestroyDroplet destroys a droplet by the ID specified and
@@ -176,14 +187,14 @@ func (c *Client) RetrieveDroplet(id string) (*Droplet, error) {
 		return nil, fmt.Errorf("Error destroying droplet: %s", parseErr(resp))
 	}
 
-	dropletResp := &DropletResponse{}
+	droplet := new(DropletResponse)
 
-	err = decodeBody(resp, dropletResp)
+	err = decodeBody(resp, &droplet)
 
 	if err != nil {
 		return nil, fmt.Errorf("Error decoding droplet response: %s", err)
 	}
 
 	// The request was successful
-	return dropletResp.Droplet, nil
+	return droplet.Droplet, nil
 }
