@@ -63,7 +63,7 @@ func (d *Droplet) IPV4Address() string {
 
 // Returns the ipv6 adddress
 func (d *Droplet) IPV6Address() string {
-	if _, ok := d.Networks["v6"]; ok {
+	if arr, ok := d.Networks["v6"]; ok && len(arr) > 0 {
 		return d.Networks["v6"][0]["ip_address"].(string)
 	}
 
