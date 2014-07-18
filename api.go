@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 )
 
 // Client provides a client to the DigitalOcean API
@@ -33,6 +34,11 @@ type DoError struct {
 // an OAuth token by visiting the Apps & API section
 // of the DigitalOcean control panel for your account.
 func NewClient(token string) (*Client, error) {
+	// If it exists, grab teh token from the environment
+	if token == "" {
+		token = os.Getenv("DIGITALOCEAN_TOKEN")
+	}
+
 	client := Client{
 		Token: token,
 		URL:   "https://api.digitalocean.com/v2",

@@ -1,6 +1,7 @@
 package digitalocean
 
 import (
+	"os"
 	"testing"
 )
 
@@ -16,6 +17,19 @@ func makeClient(t *testing.T) *Client {
 	}
 
 	return client
+}
+
+func Test_NewClient_env(t *testing.T) {
+	os.Setenv("DIGITALOCEAN_TOKEN", "bar")
+	client, err := NewClient("")
+
+	if err != nil {
+		t.Fatalf("err: %v", err)
+	}
+
+	if client.Token != "bar" {
+		t.Fatalf("token not set on client: %s", client.Token)
+	}
 }
 
 func TestClient_NewRequest(t *testing.T) {
