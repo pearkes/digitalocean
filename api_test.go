@@ -39,7 +39,7 @@ func TestClient_NewRequest(t *testing.T) {
 		t.Fatalf("bad: %v", encoded)
 	}
 
-	if req.URL.String() != "https://api.digitalocean.com/v2?baz=bar&foo=bar" {
+	if req.URL.String() != "https://api.digitalocean.com/v2/bar?baz=bar&foo=bar" {
 		t.Fatalf("bad base url: %v", req.URL.String())
 	}
 

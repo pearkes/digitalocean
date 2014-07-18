@@ -8,8 +8,6 @@ import (
 	"net/url"
 )
 
-const DIGITALOCEAN_API_URL = "https://api.digitalocean.com/v2"
-
 // Client provides a client to the DigitalOcean API
 type Client struct {
 	// Access Token
@@ -35,17 +33,18 @@ type DoError struct {
 // an OAuth token by visiting the Apps & API section
 // of the DigitalOcean control panel for your account.
 func NewClient(token string) (*Client, error) {
-	client := &Client{
+	client := Client{
 		Token: token,
-		URL:   DIGITALOCEAN_API_URL,
+		URL:   "https://api.digitalocean.com/v2",
+		Http:  http.DefaultClient,
 	}
-	return client, nil
+	return &client, nil
 }
 
 // Creates a new request with the params
 func (c *Client) NewRequest(params map[string]string, method string, endpoint string) (*http.Request, error) {
 	p := url.Values{}
-	u, err := url.Parse(c.URL)
+	u, err := url.Parse(c.URL + endpoint)
 
 	if err != nil {
 		return nil, fmt.Errorf("Error parsing base URL: %s", err)
@@ -91,7 +90,6 @@ func parseErr(resp *http.Response) error {
 // decodeBody is used to JSON decode a body
 func decodeBody(resp *http.Response, out interface{}) error {
 	body, err := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
 
 	if err != nil {
 		return err
@@ -114,14 +112,16 @@ func checkResp(resp *http.Response, err error) (*http.Response, error) {
 		return resp, err
 	}
 
-	// Verify that the request was sucessful
-	// 200 is the standard request code returned by the DO API,
-	// but 204 is used on successful DELETE requests
-	if resp.StatusCode != 200 || resp.StatusCode != 204 {
-		// Parse the err and retun it
+	switch i := resp.StatusCode; {
+	case i == 200:
+		return resp, nil
+	case i == 202:
+		return resp, nil
+	case i == 204:
+		return resp, nil
+	case i == 400:
 		return resp, parseErr(resp)
+	default:
+		return resp, fmt.Errorf("API Error: %s", resp.Status)
 	}
-
-	// The request was succesful, so return a nil error
-	return resp, nil
 }

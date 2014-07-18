@@ -2,23 +2,71 @@ package digitalocean
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
+
+type DropletResponse struct {
+	Droplet *Droplet `json:"droplet"`
+}
 
 // Droplet is used to represent a retrieved Droplet. All properties
 // are set as strings.
 type Droplet struct {
-	Id          string `json:"id"`
-	Name        string `json:"name"`
-	Region      string `json:"region>slug"`
-	Image       string `json:"image>slug"`
-	Size        string `json:"size>slug"`
-	Locked      string `json:"locked"`
-	Status      string `json:"status"`
-	IPV6Address string `json:"networks>v6>ip_address"`
-	IPV4Address string `json:"networks>v4>ip_address"`
-	IPV6Type    string `json:"networks>v6>type"`
-	IPV4Type    string `json:"networks>v4>type"`
+	Id       int64                                  `json:"id"`
+	Name     string                                 `json:"name"`
+	Region   map[string]interface{}                 `json:"region"`
+	Image    map[string]interface{}                 `json:"image"`
+	Size     map[string]interface{}                 `json:"size"`
+	Locked   bool                                   `json:"locked"`
+	Status   string                                 `json:"status"`
+	Networks map[string]map[interface{}]interface{} `json:"networks"`
+}
+
+// Returns the slug for the region
+func (d *Droplet) RegionSlug() string {
+	return d.Region["slug"].(string)
+}
+
+// Returns the slug for the region
+func (d *Droplet) StringId() string {
+	return strconv.FormatInt(d.Id, 10)
+}
+
+// Returns the string for Locked
+func (d *Droplet) IsLocked() string {
+	return strconv.FormatBool(d.Locked)
+}
+
+// Returns the slug for the image
+func (d *Droplet) ImageSlug() string {
+	if _, ok := d.Image["slug"]; ok {
+		return d.Image["slug"].(string)
+	} else {
+		return strconv.FormatInt(d.Image["id"].(int64), 10)
+	}
+}
+
+// Returns the slug for the size
+func (d *Droplet) SizeSlug() string {
+	return d.Size["slug"].(string)
+}
+
+// Returns the ipv4 address
+func (d *Droplet) IPV4Address() string {
+	return d.Networks["ipv4"]["ip_address"].(string)
+}
+
+// Returns the ipv6 adddress
+func (d *Droplet) IPV6Address() string {
+	return d.Networks["ipv6"]["ip_address"].(string)
+}
+
+// Currently DO only has a network type per droplet,
+// so we just takes ipv4s
+func (d *Droplet) NetworkingType() string {
+	return d.Networks["ipv4"]["type"].(string)
+
 }
 
 // CreateDroplet contains the request parameters to create a new
@@ -28,17 +76,16 @@ type CreateDroplet struct {
 	Region            string   // Slug of the region to create the droplet in
 	Size              string   // Slug of the size to use for the droplet
 	Image             string   // Slug of the image, if using a public image
-	ImageID           string   // ID of the image, if using a private image
-	SSH_keys          []string // Array of SSH Key IDs that should be added
+	SSHKeys           []string // Array of SSH Key IDs that should be added
 	Backups           string   // 'true' or 'false' if backups are enabled
 	IPV6              string   // 'true' or 'false' if IPV6 is enabled
 	PrivateNetworking string   // 'true' or 'false' if Private Networking is enabled
 }
 
-// Create creates a droplet from the parameters specified and
-// returns an error if it fails. If no error is returned,
+// CreateDroplet creates a droplet from the parameters specified and
+// returns an error if it fails. If no error and an ID is returned,
 // the Droplet was succesfully created.
-func (c *Client) Create(opts *CreateDroplet) error {
+func (c *Client) CreateDroplet(opts *CreateDroplet) (string, error) {
 	// Make the request parameters
 	params := make(map[string]string)
 
@@ -49,14 +96,9 @@ func (c *Client) Create(opts *CreateDroplet) error {
 	if opts.Image != "" {
 		params["image"] = opts.Image
 	}
-	// If we specify the image_id, we override the
-	// image slug
-	if opts.ImageID != "" {
-		params["image"] = opts.ImageID
-	}
 
-	if len(opts.SSH_keys) > 0 {
-		params["ssh_keys"] = strings.Join(opts.SSH_keys, ",")
+	if len(opts.SSHKeys) > 0 {
+		params["ssh_keys"] = strings.Join(opts.SSHKeys, ",")
 	}
 
 	if opts.Backups == "" {
@@ -79,22 +121,31 @@ func (c *Client) Create(opts *CreateDroplet) error {
 
 	req, err := c.NewRequest(params, "POST", "/droplets")
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	resp, err := checkResp(c.Http.Do(req))
+
 	if err != nil {
-		return fmt.Errorf("Error creating droplet: %s", parseErr(resp))
+		return "", fmt.Errorf("Error creating droplet: %s", err)
+	}
+
+	droplet := new(DropletResponse)
+
+	err = decodeBody(resp, &droplet)
+
+	if err != nil {
+		return "", fmt.Errorf("Error parsing droplet response: %s", err)
 	}
 
 	// The request was successful
-	return nil
+	return string(droplet.Droplet.StringId()), nil
 }
 
-// Destroy destroys a droplet by the ID specified and
+// DestroyDroplet destroys a droplet by the ID specified and
 // returns an error if it fails. If no error is returned,
 // the Droplet was succesfully destroyed.
-func (c *Client) Destroy(id string) error {
+func (c *Client) DestroyDroplet(id string) error {
 	req, err := c.NewRequest(map[string]string{}, "DELETE", fmt.Sprintf("/droplets/%s", id))
 
 	if err != nil {
@@ -110,10 +161,10 @@ func (c *Client) Destroy(id string) error {
 	return nil
 }
 
-// Retrieve gets  a droplet by the ID specified and
+// RetrieveDroplet gets  a droplet by the ID specified and
 // returns a Droplet and an error. An error will be returned for failed
 // requests with a nil Droplet.
-func (c *Client) Retrieve(id string) (*Droplet, error) {
+func (c *Client) RetrieveDroplet(id string) (*Droplet, error) {
 	req, err := c.NewRequest(map[string]string{}, "GET", fmt.Sprintf("/droplets/%s", id))
 
 	if err != nil {
@@ -125,13 +176,14 @@ func (c *Client) Retrieve(id string) (*Droplet, error) {
 		return nil, fmt.Errorf("Error destroying droplet: %s", parseErr(resp))
 	}
 
-	droplet := &Droplet{}
-	err = decodeBody(resp, droplet)
+	dropletResp := &DropletResponse{}
+
+	err = decodeBody(resp, dropletResp)
 
 	if err != nil {
 		return nil, fmt.Errorf("Error decoding droplet response: %s", err)
 	}
 
 	// The request was successful
-	return droplet, nil
+	return dropletResp.Droplet, nil
 }
