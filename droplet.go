@@ -42,8 +42,10 @@ func (d *Droplet) IsLocked() string {
 func (d *Droplet) ImageSlug() string {
 	if _, ok := d.Image["slug"]; ok {
 		return d.Image["slug"].(string)
-	} else {
+	} else if _, ok := d.Image["id"].(int64); ok {
 		return strconv.FormatInt(d.Image["id"].(int64), 10)
+	} else {
+		return ""
 	}
 }
 
