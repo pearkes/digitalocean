@@ -12,4 +12,4 @@ a standard DO API client.**
 
 ### Documentation
 
-The full documentation is available on [Godoc](http://godoc.org/github.com/pearkes/go-digitalocean)
+The full documentation is available on [Godoc](http://godoc.org/github.com/pearkes/digitalocean)
