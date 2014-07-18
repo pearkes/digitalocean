@@ -41,12 +41,22 @@ func (d *Droplet) IsLocked() string {
 // Returns the slug for the image
 func (d *Droplet) ImageSlug() string {
 	if _, ok := d.Image["slug"]; ok {
-		return d.Image["slug"].(string)
-	} else if _, ok := d.Image["id"].(int64); ok {
-		return strconv.FormatInt(d.Image["id"].(int64), 10)
-	} else {
-		return ""
+		if attr, ok := d.Image["slug"].(string); ok {
+			return attr
+		}
 	}
+
+	return ""
+}
+
+func (d *Droplet) ImageId() string {
+	if _, ok := d.Image["id"]; ok {
+		if attr, ok := d.Image["id"].(float64); ok {
+			return strconv.FormatFloat(attr, 'f', 0, 64)
+		}
+	}
+
+	return ""
 }
 
 // Returns the slug for the size
