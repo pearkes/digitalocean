@@ -25,7 +25,11 @@ type Droplet struct {
 
 // Returns the slug for the region
 func (d *Droplet) RegionSlug() string {
-	return d.Region["slug"].(string)
+	if _, ok := d.Region["slug"]; ok {
+		return d.Region["slug"].(string)
+	}
+
+	return ""
 }
 
 // Returns the slug for the region
@@ -61,7 +65,11 @@ func (d *Droplet) ImageId() string {
 
 // Returns the slug for the size
 func (d *Droplet) SizeSlug() string {
-	return d.Size["slug"].(string)
+	if _, ok := d.Size["slug"]; ok {
+		return d.Size["slug"].(string)
+	}
+
+	return ""
 }
 
 // Returns the ipv4 address
