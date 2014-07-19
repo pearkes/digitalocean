@@ -210,3 +210,51 @@ func (c *Client) RetrieveDroplet(id string) (Droplet, error) {
 	// The request was successful
 	return droplet.Droplet, nil
 }
+
+// Action sends the specified action to the droplet. An error
+// is retunred, and is nil if successful
+func (c *Client) Action(id string, action map[string]string) error {
+	req, err := c.NewRequest(action, "POST", fmt.Sprintf("/droplets/%s/actions", id))
+
+	if err != nil {
+		return err
+	}
+
+	resp, err := checkResp(c.Http.Do(req))
+	if err != nil {
+		return fmt.Errorf("Error processing droplet action: %s", parseErr(resp))
+	}
+
+	// The request was successful
+	return nil
+}
+
+// Resizes a droplet to the size slug specified
+func (c *Client) Resize(id string, size string) error {
+	return c.Action(id, map[string]string{
+		"type": "resize",
+		"size": size,
+	})
+}
+
+// Renames a droplet to the name specified
+func (c *Client) Rename(id string, name string) error {
+	return c.Action(id, map[string]string{
+		"type": "rename",
+		"name": name,
+	})
+}
+
+// Enables IPV6 on the droplet
+func (c *Client) EnableIPV6s(id string) error {
+	return c.Action(id, map[string]string{
+		"type": "enable_ipv6",
+	})
+}
+
+// Enables private networking on the droplet
+func (c *Client) EnablePrivateNetworking(id string) error {
+	return c.Action(id, map[string]string{
+		"type": "enable_private_networking",
+	})
+}

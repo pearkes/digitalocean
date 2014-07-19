@@ -92,6 +92,52 @@ func (s *S) Test_DestroyDroplet(c *C) {
 	c.Assert(err, IsNil)
 }
 
+func (s *S) Test_Resize(c *C) {
+	testServer.Response(200, nil, dropletExampleAction)
+
+	err := s.client.Resize("25", "1gb")
+
+	req := testServer.WaitRequest()
+
+	c.Assert(err, IsNil)
+	c.Assert(req.Form["size"], DeepEquals, []string{"1gb"})
+	c.Assert(req.Form["type"], DeepEquals, []string{"resize"})
+}
+
+func (s *S) Test_Rename(c *C) {
+	testServer.Response(200, nil, dropletExampleAction)
+
+	err := s.client.Rename("25", "foobar")
+
+	req := testServer.WaitRequest()
+
+	c.Assert(err, IsNil)
+	c.Assert(req.Form["name"], DeepEquals, []string{"foobar"})
+	c.Assert(req.Form["type"], DeepEquals, []string{"rename"})
+}
+
+func (s *S) Test_EnableIPV6s(c *C) {
+	testServer.Response(200, nil, dropletExampleAction)
+
+	err := s.client.EnableIPV6s("25")
+
+	req := testServer.WaitRequest()
+
+	c.Assert(err, IsNil)
+	c.Assert(req.Form["type"], DeepEquals, []string{"enable_ipv6"})
+}
+
+func (s *S) Test_EnablePrivateNetworking(c *C) {
+	testServer.Response(200, nil, dropletExampleAction)
+
+	err := s.client.EnablePrivateNetworking("25")
+
+	req := testServer.WaitRequest()
+
+	c.Assert(err, IsNil)
+	c.Assert(req.Form["type"], DeepEquals, []string{"enable_private_networking"})
+}
+
 var dropletExample = `{
   "droplet": {
     "id": 25,
@@ -263,5 +309,18 @@ var dropletExampleNoImage = `{
         "href": "http://example.org/v2/actions/20"
       }
     ]
+  }
+}`
+
+var dropletExampleAction = `{
+  "action": {
+    "id": 15,
+    "status": "in-progress",
+    "type": "enable_ipv6",
+    "started_at": "2014-07-18T16:20:37Z",
+    "completed_at": null,
+    "resource_id": 15,
+    "resource_type": "droplet",
+    "region": "nyc1"
   }
 }`
