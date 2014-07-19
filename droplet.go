@@ -267,3 +267,17 @@ func (c *Client) EnablePrivateNetworking(id string) error {
 		"type": "enable_private_networking",
 	})
 }
+
+// Resizes a droplet to the size slug specified
+func (c *Client) PowerOff(id string) error {
+	return c.Action(id, map[string]string{
+		"type": "power_off",
+	})
+}
+
+// Resizes a droplet to the size slug specified
+func (c *Client) PowerOn(id string) error {
+	return c.Action(id, map[string]string{
+		"type": "power_on",
+	})
+}
