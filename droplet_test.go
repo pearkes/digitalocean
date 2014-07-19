@@ -139,6 +139,22 @@ func (s *S) Test_EnablePrivateNetworking(c *C) {
 	c.Assert(req.Form["type"], DeepEquals, []string{"enable_private_networking"})
 }
 
+func (s *S) Test_ActionError(c *C) {
+	testServer.Response(422, nil, dropletExampleActionError)
+
+	err := s.client.EnablePrivateNetworking("25")
+
+	req := testServer.WaitRequest()
+
+	c.Assert(req.Form["type"], DeepEquals, []string{"enable_private_networking"})
+	c.Assert(err.Error(), Equals, "Error processing droplet action: API Error: unprocessable_entity: You specified an invalid size for Droplet creation.")
+}
+
+var dropletExampleActionError = `{
+  "id": "unprocessable_entity",
+  "message": "You specified an invalid size for Droplet creation."
+}`
+
 var dropletExample = `{
   "droplet": {
     "id": 25,

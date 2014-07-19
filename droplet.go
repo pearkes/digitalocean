@@ -183,9 +183,10 @@ func (c *Client) DestroyDroplet(id string) error {
 		return err
 	}
 
-	resp, err := checkResp(c.Http.Do(req))
+	_, err = checkResp(c.Http.Do(req))
+
 	if err != nil {
-		return fmt.Errorf("Error destroying droplet: %s", parseErr(resp))
+		return fmt.Errorf("Error destroying droplet: %s", err)
 	}
 
 	// The request was successful
@@ -204,7 +205,7 @@ func (c *Client) RetrieveDroplet(id string) (Droplet, error) {
 
 	resp, err := checkResp(c.Http.Do(req))
 	if err != nil {
-		return Droplet{}, fmt.Errorf("Error destroying droplet: %s", parseErr(resp))
+		return Droplet{}, fmt.Errorf("Error destroying droplet: %s", err)
 	}
 
 	droplet := new(DropletResponse)
@@ -228,9 +229,9 @@ func (c *Client) Action(id string, action map[string]string) error {
 		return err
 	}
 
-	resp, err := checkResp(c.Http.Do(req))
+	_, err = checkResp(c.Http.Do(req))
 	if err != nil {
-		return fmt.Errorf("Error processing droplet action: %s", parseErr(resp))
+		return fmt.Errorf("Error processing droplet action: %s", err)
 	}
 
 	// The request was successful

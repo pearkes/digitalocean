@@ -83,7 +83,7 @@ func (c *Client) NewRequest(params map[string]string, method string, endpoint st
 func parseErr(resp *http.Response) error {
 	errBody := new(DoError)
 
-	err := decodeBody(resp, errBody)
+	err := decodeBody(resp, &errBody)
 
 	// if there was an error decoding the body, just return that
 	if err != nil {
@@ -125,9 +125,11 @@ func checkResp(resp *http.Response, err error) (*http.Response, error) {
 		return resp, nil
 	case i == 204:
 		return resp, nil
+	case i == 422:
+		return nil, parseErr(resp)
 	case i == 400:
-		return resp, parseErr(resp)
+		return nil, parseErr(resp)
 	default:
-		return resp, fmt.Errorf("API Error: %s", resp.Status)
+		return nil, fmt.Errorf("API Error: %s", resp.Status)
 	}
 }
