@@ -7,7 +7,7 @@ import (
 )
 
 type DropletResponse struct {
-	Droplet *Droplet `json:"droplet"`
+	Droplet Droplet `json:"droplet"`
 }
 
 // Droplet is used to represent a retrieved Droplet. All properties
@@ -187,24 +187,24 @@ func (c *Client) DestroyDroplet(id string) error {
 // RetrieveDroplet gets  a droplet by the ID specified and
 // returns a Droplet and an error. An error will be returned for failed
 // requests with a nil Droplet.
-func (c *Client) RetrieveDroplet(id string) (*Droplet, error) {
+func (c *Client) RetrieveDroplet(id string) (Droplet, error) {
 	req, err := c.NewRequest(map[string]string{}, "GET", fmt.Sprintf("/droplets/%s", id))
 
 	if err != nil {
-		return nil, err
+		return Droplet{}, err
 	}
 
 	resp, err := checkResp(c.Http.Do(req))
 	if err != nil {
-		return nil, fmt.Errorf("Error destroying droplet: %s", parseErr(resp))
+		return Droplet{}, fmt.Errorf("Error destroying droplet: %s", parseErr(resp))
 	}
 
 	droplet := new(DropletResponse)
 
-	err = decodeBody(resp, &droplet)
+	err = decodeBody(resp, droplet)
 
 	if err != nil {
-		return nil, fmt.Errorf("Error decoding droplet response: %s", err)
+		return Droplet{}, fmt.Errorf("Error decoding droplet response: %s", err)
 	}
 
 	// The request was successful
