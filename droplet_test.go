@@ -1,36 +1,13 @@
 package digitalocean
 
 import (
-	"github.com/pearkes/digitalocean/testutil"
 	"testing"
 
 	. "github.com/motain/gocheck"
 )
 
-func Test(t *testing.T) {
+func TestDroplet(t *testing.T) {
 	TestingT(t)
-}
-
-type S struct {
-	client *Client
-}
-
-var _ = Suite(&S{})
-
-var testServer = testutil.NewHTTPServer()
-
-func (s *S) SetUpSuite(c *C) {
-	testServer.Start()
-	var err error
-	s.client, err = NewClient("foobar")
-	s.client.URL = "http://localhost:4444"
-	if err != nil {
-		panic(err)
-	}
-}
-
-func (s *S) TearDownTest(c *C) {
-	testServer.Flush()
 }
 
 func (s *S) Test_CreateDroplet(c *C) {
