@@ -129,7 +129,7 @@ func (c *Client) CreateDroplet(opts *CreateDroplet) (string, error) {
 	}
 
 	if len(opts.SSHKeys) > 0 {
-		params["ssh_keys"] = strings.Join(opts.SSHKeys, ",")
+		params["ssh_keys"] = fmt.Sprintf("[%s]", strings.Join(opts.SSHKeys, ","))
 	}
 
 	if opts.Backups == "" {
