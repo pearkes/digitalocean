@@ -25,15 +25,15 @@ func (r *Record) StringId() string {
 	return strconv.Itoa(r.Id)
 }
 
-func (r *Record) PriorityId() string {
+func (r *Record) StringPriority() string {
 	return strconv.Itoa(r.Priority)
 }
 
-func (r *Record) PortId() string {
+func (r *Record) StringPort() string {
 	return strconv.Itoa(r.Port)
 }
 
-func (r *Record) WeightId() string {
+func (r *Record) StringWeight() string {
 	return strconv.Itoa(r.Weight)
 }
 

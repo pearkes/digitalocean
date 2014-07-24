@@ -39,6 +39,8 @@ func (s *S) Test_RetrieveRecord(c *C) {
 
 	c.Assert(err, IsNil)
 	c.Assert(record.Name, Equals, "subdomain")
+	c.Assert(record.StringId(), Equals, "16")
+	c.Assert(record.StringPort(), Equals, "0")
 }
 
 func (s *S) Test_DestroyRecord(c *C) {
