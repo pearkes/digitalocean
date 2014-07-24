@@ -121,6 +121,8 @@ func checkResp(resp *http.Response, err error) (*http.Response, error) {
 	switch i := resp.StatusCode; {
 	case i == 200:
 		return resp, nil
+	case i == 201:
+		return resp, nil
 	case i == 202:
 		return resp, nil
 	case i == 204:
