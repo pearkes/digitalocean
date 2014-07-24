@@ -35,6 +35,7 @@ func (s *S) Test_RetrieveDomain(c *C) {
 
 	c.Assert(err, IsNil)
 	c.Assert(domain.Name, Equals, "example.com")
+	c.Assert(domain.ZoneFile, Equals, "")
 }
 
 func (s *S) Test_DestroyDomain(c *C) {

@@ -11,7 +11,8 @@ type DomainResponse struct {
 // Domain is used to represent a retrieved Domain. All properties
 // are set as strings.
 type Domain struct {
-	Name string `json:"name"`
+	Name     string `json:"name"`
+	ZoneFile string `json:"zone_file"`
 }
 
 // CreateDomain contains the request parameters to create a new
