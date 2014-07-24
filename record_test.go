@@ -51,6 +51,20 @@ func (s *S) Test_DestroyRecord(c *C) {
 	c.Assert(err, IsNil)
 }
 
+func (s *S) Test_UpdateRecord(c *C) {
+	testServer.Response(204, nil, "")
+
+	opts := UpdateRecord{
+		Name: "foobar",
+	}
+
+	err := s.client.UpdateRecord("example.com", "25", &opts)
+
+	_ = testServer.WaitRequest()
+
+	c.Assert(err, IsNil)
+}
+
 var recordErrorExample = `{
   "id": "unprocessable_entity",
   "message": "Type can't be blank."

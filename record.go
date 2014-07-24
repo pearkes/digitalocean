@@ -120,6 +120,36 @@ func (c *Client) DestroyRecord(domain string, id string) error {
 	return nil
 }
 
+// UpdateRecord contains the request parameters to create a new
+// record.
+type UpdateRecord struct {
+	Name string
+}
+
+// UpdateRecord destroys a record by the ID specified and
+// returns an error if it fails. If no error is returned,
+// the Record was succesfully updated.
+func (c *Client) UpdateRecord(domain string, id string, opts *UpdateRecord) error {
+	params := make(map[string]string)
+
+	params["name"] = opts.Name
+
+	req, err := c.NewRequest(map[string]string{}, "PUT", fmt.Sprintf("/domains/%s/records/%s", domain, id))
+
+	if err != nil {
+		return err
+	}
+
+	_, err = checkResp(c.Http.Do(req))
+
+	if err != nil {
+		return fmt.Errorf("Error updating record: %s", err)
+	}
+
+	// The request was successful
+	return nil
+}
+
 // RetrieveRecord gets  a record by the ID specified and
 // returns a Record and an error. An error will be returned for failed
 // requests with a nil Record.
