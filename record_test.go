@@ -57,13 +57,14 @@ func (s *S) Test_UpdateRecord(c *C) {
 	testServer.Response(204, nil, "")
 
 	opts := UpdateRecord{
-		Name: "foobar",
+		Name: "foobaz",
 	}
 
 	err := s.client.UpdateRecord("example.com", "25", &opts)
 
-	_ = testServer.WaitRequest()
+	req := testServer.WaitRequest()
 
+	c.Assert(req.Form["name"], DeepEquals, []string{"foobaz"})
 	c.Assert(err, IsNil)
 }
 

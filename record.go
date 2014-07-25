@@ -134,7 +134,7 @@ func (c *Client) UpdateRecord(domain string, id string, opts *UpdateRecord) erro
 
 	params["name"] = opts.Name
 
-	req, err := c.NewRequest(map[string]string{}, "PUT", fmt.Sprintf("/domains/%s/records/%s", domain, id))
+	req, err := c.NewRequest(params, "PUT", fmt.Sprintf("/domains/%s/records/%s", domain, id))
 
 	if err != nil {
 		return err
