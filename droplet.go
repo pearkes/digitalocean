@@ -73,31 +73,37 @@ func (d *Droplet) SizeSlug() string {
 }
 
 // Returns the ipv4 address
-func (d *Droplet) IPV4Address() string {
+func (d *Droplet) IPV4Address(addressType string) string {
 	if _, ok := d.Networks["v4"]; ok {
-		return d.Networks["v4"][0]["ip_address"].(string)
+		for _, v := range d.Networks["v4"] {
+			if v["type"].(string) == addressType {
+				return v["ip_address"].(string)
+			}
+		}
 	}
-
 	return ""
 }
 
 // Returns the ipv6 adddress
-func (d *Droplet) IPV6Address() string {
-	if arr, ok := d.Networks["v6"]; ok && len(arr) > 0 {
-		return d.Networks["v6"][0]["ip_address"].(string)
+func (d *Droplet) IPV6Address(addressType string) string {
+	if _, ok := d.Networks["v6"]; ok {
+		for _, v := range d.Networks["v6"] {
+			if v["type"].(string) == addressType {
+				return v["ip_address"].(string)
+			}
+		}
 	}
-
 	return ""
 }
 
 // Currently DO only has a network type per droplet,
 // so we just takes ipv4s
 func (d *Droplet) NetworkingType() string {
-	if _, ok := d.Networks["v4"]; ok {
-		return d.Networks["v4"][0]["type"].(string)
+	if d.IPV4Address("private") != "" {
+		return "private"
+	} else {
+		return "public"
 	}
-
-	return ""
 }
 
 // CreateDroplet contains the request parameters to create a new

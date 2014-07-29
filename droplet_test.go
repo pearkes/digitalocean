@@ -37,8 +37,10 @@ func (s *S) Test_RetrieveDroplet(c *C) {
 	c.Assert(droplet.StringId(), Equals, "25")
 	c.Assert(droplet.RegionSlug(), Equals, "nyc1")
 	c.Assert(droplet.IsLocked(), Equals, "false")
-	c.Assert(droplet.NetworkingType(), Equals, "public")
-	c.Assert(droplet.IPV6Address(), Equals, "")
+	c.Assert(droplet.NetworkingType(), Equals, "private")
+	c.Assert(droplet.IPV4Address("public"), Equals, "127.0.0.20")
+	c.Assert(droplet.IPV4Address("private"), Equals, "10.0.0.1")
+	c.Assert(droplet.IPV6Address("public"), Equals, "")
 	c.Assert(droplet.ImageSlug(), Equals, "foobar")
 }
 
@@ -54,7 +56,10 @@ func (s *S) Test_RetrieveDroplet_noImage(c *C) {
 	c.Assert(droplet.RegionSlug(), Equals, "nyc1")
 	c.Assert(droplet.IsLocked(), Equals, "false")
 	c.Assert(droplet.NetworkingType(), Equals, "public")
-	c.Assert(droplet.IPV6Address(), Equals, "")
+	c.Assert(droplet.IPV6Address("public"), Equals, "")
+	c.Assert(droplet.IPV4Address("public"), Equals, "127.0.0.20")
+	c.Assert(droplet.IPV4Address("private"), Equals, "")
+	c.Assert(droplet.IPV6Address("private"), Equals, "")
 	c.Assert(droplet.ImageSlug(), Equals, "")
 	c.Assert(droplet.SizeSlug(), Equals, "512mb")
 	c.Assert(droplet.ImageId(), Equals, "449676389")
@@ -202,6 +207,12 @@ var dropletExample = `{
     "status": "new",
     "networks": {
       "v4": [
+        {
+          "ip_address": "10.0.0.1",
+          "netmask": "255.255.255.0",
+          "gateway": "10.0.0.0",
+          "type": "private"
+        },
         {
           "ip_address": "127.0.0.20",
           "netmask": "255.255.255.0",
