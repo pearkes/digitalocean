@@ -117,6 +117,7 @@ type CreateDroplet struct {
 	Backups           string   // 'true' or 'false' if backups are enabled
 	IPV6              string   // 'true' or 'false' if IPV6 is enabled
 	PrivateNetworking string   // 'true' or 'false' if Private Networking is enabled
+	UserData          string   // metadata for the droplet
 }
 
 // CreateDroplet creates a droplet from the parameters specified and
@@ -154,6 +155,10 @@ func (c *Client) CreateDroplet(opts *CreateDroplet) (string, error) {
 		params["private_networking"] = "false"
 	} else {
 		params["private_networking"] = opts.PrivateNetworking
+	}
+
+	if opts.UserData != "" {
+		params["user_data"] = opts.UserData
 	}
 
 	req, err := c.NewRequest(params, "POST", "/droplets")

@@ -14,7 +14,8 @@ func (s *S) Test_CreateDroplet(c *C) {
 	testServer.Response(202, nil, dropletExample)
 
 	opts := CreateDroplet{
-		Name: "foobar",
+		Name:     "foobar",
+		UserData: "baz",
 	}
 
 	id, err := s.client.CreateDroplet(&opts)
@@ -22,6 +23,7 @@ func (s *S) Test_CreateDroplet(c *C) {
 	req := testServer.WaitRequest()
 
 	c.Assert(req.Form["name"], DeepEquals, []string{"foobar"})
+	c.Assert(req.Form["user_data"], DeepEquals, []string{"baz"})
 	c.Assert(err, IsNil)
 	c.Assert(id, Equals, "25")
 }
