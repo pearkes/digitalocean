@@ -63,7 +63,7 @@ func (s *S) Test_RetrieveDroplet_noImage(c *C) {
 	c.Assert(droplet.IPV4Address("private"), Equals, "")
 	c.Assert(droplet.IPV6Address("private"), Equals, "")
 	c.Assert(droplet.ImageSlug(), Equals, "")
-	c.Assert(droplet.SizeSlug(), Equals, "512mb")
+	c.Assert(droplet.SizeSlug, Equals, "512mb")
 	c.Assert(droplet.ImageId(), Equals, "449676389")
 }
 
