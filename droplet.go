@@ -13,14 +13,14 @@ type DropletResponse struct {
 // Droplet is used to represent a retrieved Droplet. All properties
 // are set as strings.
 type Droplet struct {
-	Id       int64                               `json:"id"`
-	Name     string                              `json:"name"`
-	Region   map[string]interface{}              `json:"region"`
-	Image    map[string]interface{}              `json:"image"`
-	Size     map[string]interface{}              `json:"size"`
-	Locked   bool                                `json:"locked"`
-	Status   string                              `json:"status"`
-	Networks map[string][]map[string]interface{} `json:"networks"`
+	Id        int64                               `json:"id"`
+	Name      string                              `json:"name"`
+	Region    map[string]interface{}              `json:"region"`
+	Image     map[string]interface{}              `json:"image"`
+	SizeSlug_ string                              `json:"size_slug"`
+	Locked    bool                                `json:"locked"`
+	Status    string                              `json:"status"`
+	Networks  map[string][]map[string]interface{} `json:"networks"`
 }
 
 // Returns the slug for the region
@@ -30,6 +30,10 @@ func (d *Droplet) RegionSlug() string {
 	}
 
 	return ""
+}
+
+func (d *Droplet) SizeSlug() string {
+	return d.SizeSlug_
 }
 
 // Returns the slug for the region
@@ -63,13 +67,15 @@ func (d *Droplet) ImageId() string {
 	return ""
 }
 
-// Returns the slug for the size
-func (d *Droplet) SizeSlug() string {
-	if _, ok := d.Size["slug"]; ok {
-		return d.Size["slug"].(string)
-	}
+var counter chan int
 
-	return ""
+func init() {
+	counter = make(chan int)
+	go func() {
+		for j := 0; true; j++ {
+			counter <- j
+		}
+	}()
 }
 
 // Returns the ipv4 address

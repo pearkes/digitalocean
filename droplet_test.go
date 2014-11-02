@@ -191,20 +191,7 @@ var dropletExample = `{
       ],
       "created_at": "2014-07-18T16:20:40Z"
     },
-    "size": {
-      "slug": "512mb",
-      "memory": 512,
-      "vcpus": 1,
-      "disk": 20,
-      "transfer": null,
-      "price_monthly": "5.0",
-      "price_hourly": "0.00744",
-      "regions": [
-        "nyc1",
-        "sfo1",
-        "ams1"
-      ]
-    },
+    "size_slug": "512mb",
     "locked": false,
     "status": "new",
     "networks": {
@@ -284,20 +271,7 @@ var dropletExampleNoImage = `{
       ],
       "created_at": "2014-07-18T16:20:40Z"
     },
-    "size": {
-      "slug": "512mb",
-      "memory": 512,
-      "vcpus": 1,
-      "disk": 20,
-      "transfer": null,
-      "price_monthly": "5.0",
-      "price_hourly": "0.00744",
-      "regions": [
-        "nyc1",
-        "sfo1",
-        "ams1"
-      ]
-    },
+    "size_slug": "512mb",
     "locked": false,
     "status": "new",
     "networks": {
