@@ -130,21 +130,15 @@ func (c *Client) CreateDroplet(opts *CreateDroplet) (string, error) {
 		params["ssh_keys[]"] = strings.Join(opts.SSHKeys, ",")
 	}
 
-	if opts.Backups == "" {
-		params["backups"] = "false"
-	} else {
+	if opts.Backups != "" && opts.Backups != "false" {
 		params["backups"] = opts.Backups
 	}
 
-	if opts.IPV6 == "" {
-		params["ipv6"] = "false"
-	} else {
+	if opts.IPV6 != "" && opts.IPV6 != "false" {
 		params["ipv6"] = opts.IPV6
 	}
 
-	if opts.PrivateNetworking == "" {
-		params["private_networking"] = "false"
-	} else {
+	if opts.PrivateNetworking != "" && opts.PrivateNetworking != "false" {
 		params["private_networking"] = opts.PrivateNetworking
 	}
 
