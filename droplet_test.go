@@ -28,6 +28,32 @@ func (s *S) Test_CreateDroplet(c *C) {
 	c.Assert(id, Equals, "25")
 }
 
+func (s *S) Test_RetrieveDroplets(c *C) {
+	testServer.Response(200, nil, dropletsExample)
+
+	droplets, err := s.client.RetrieveDroplets()
+
+	_ = testServer.WaitRequest()
+
+	c.Assert(err, IsNil)
+	c.Assert(len(droplets), Equals, 2)
+
+	c.Assert(droplets[0].StringId(), Equals, "25")
+	c.Assert(droplets[1].StringId(), Equals, "26")
+	c.Assert(droplets[0].IPV4Address("public"), Equals, "127.0.0.19")
+	c.Assert(droplets[1].IPV4Address("public"), Equals, "127.0.0.20")
+	c.Assert(droplets[0].IPV4Address("private"), Equals, "10.0.0.1")
+	c.Assert(droplets[1].IPV4Address("private"), Equals, "10.0.0.2")
+
+	for _, droplet := range droplets {
+		c.Assert(droplet.RegionSlug(), Equals, "nyc1")
+		c.Assert(droplet.IsLocked(), Equals, "false")
+		c.Assert(droplet.NetworkingType(), Equals, "private")
+		c.Assert(droplet.IPV6Address("public"), Equals, "")
+		c.Assert(droplet.ImageSlug(), Equals, "foobar")
+	}
+}
+
 func (s *S) Test_RetrieveDroplet(c *C) {
 	testServer.Response(200, nil, dropletExample)
 
@@ -326,4 +352,141 @@ var dropletExampleAction = `{
     "resource_type": "droplet",
     "region": "nyc1"
   }
+}`
+
+var dropletsExample = `{
+    "droplets": [
+        {
+            "id": 25,
+            "name": "My-Droplet",
+            "region": {
+                "slug": "nyc1",
+                "name": "New York",
+                "sizes": [
+                    "1024mb",
+                    "512mb"
+                ],
+                "available": true,
+                "features": [
+                    "virtio",
+                    "private_networking",
+                    "backups",
+                    "ipv6"
+                ]
+            },
+            "image": {
+                "id": 449676389,
+                "name": "Ubuntu 13.04",
+                "distribution": "ubuntu",
+                "slug": "foobar",
+                "public": true,
+                "regions": [
+                    "nyc1"
+                ],
+                "created_at": "2014-07-18T16:20:40Z"
+            },
+            "size_slug": "512mb",
+            "locked": false,
+            "status": "new",
+            "networks": {
+                "v4": [
+                    {
+                        "ip_address": "10.0.0.1",
+                        "netmask": "255.255.255.0",
+                        "gateway": "10.0.0.0",
+                        "type": "private"
+                    },
+                    {
+                        "ip_address": "127.0.0.19",
+                        "netmask": "255.255.255.0",
+                        "gateway": "127.0.0.21",
+                        "type": "public"
+                    }
+                ],
+                "v6": []
+            },
+            "kernel": {
+                "id": 485432972,
+                "name": "Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (1221)",
+                "version": "3.13.0-24-generic"
+            },
+            "created_at": "2014-07-18T16:20:40Z",
+            "features": [
+                "virtio"
+            ],
+            "backup_ids": [],
+            "snapshot_ids": [],
+            "action_ids": [
+                20
+            ]
+        },
+        {
+            "id": 26,
+            "name": "My-Secondary-Droplet",
+            "region": {
+                "slug": "nyc1",
+                "name": "New York",
+                "sizes": [
+                    "1024mb",
+                    "512mb"
+                ],
+                "available": true,
+                "features": [
+                    "virtio",
+                    "private_networking",
+                    "backups",
+                    "ipv6"
+                ]
+            },
+            "image": {
+                "id": 449676389,
+                "name": "Ubuntu 13.04",
+                "distribution": "ubuntu",
+                "slug": "foobar",
+                "public": true,
+                "regions": [
+                    "nyc1"
+                ],
+                "created_at": "2014-07-18T16:20:40Z"
+            },
+            "size_slug": "512mb",
+            "locked": false,
+            "status": "new",
+            "networks": {
+                "v4": [
+                    {
+                        "ip_address": "10.0.0.2",
+                        "netmask": "255.255.255.0",
+                        "gateway": "10.0.0.0",
+                        "type": "private"
+                    },
+                    {
+                        "ip_address": "127.0.0.20",
+                        "netmask": "255.255.255.0",
+                        "gateway": "127.0.0.21",
+                        "type": "public"
+                    }
+                ],
+                "v6": []
+            },
+            "kernel": {
+                "id": 485432972,
+                "name": "Ubuntu 14.04 x64 vmlinuz-3.13.0-24-generic (1221)",
+                "version": "3.13.0-24-generic"
+            },
+            "created_at": "2014-07-18T16:21:40Z",
+            "features": [
+                "virtio"
+            ],
+            "backup_ids": [],
+            "snapshot_ids": [],
+            "action_ids": [
+                20
+            ]
+        }
+    ],
+    "links": {},
+    "meta": {
+        "total": 2
+    }
 }`
