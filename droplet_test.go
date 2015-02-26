@@ -16,6 +16,7 @@ func (s *S) Test_CreateDroplet(c *C) {
 	opts := CreateDroplet{
 		Name:     "foobar",
 		UserData: "baz",
+		SSHKeys:  []string{"1"},
 	}
 
 	id, err := s.client.CreateDroplet(&opts)
@@ -24,6 +25,7 @@ func (s *S) Test_CreateDroplet(c *C) {
 
 	c.Assert(req.Form["name"], DeepEquals, []string{"foobar"})
 	c.Assert(req.Form["user_data"], DeepEquals, []string{"baz"})
+	c.Assert(req.Form["ssh_keys[]"], DeepEquals, []string{"1"})
 	c.Assert(err, IsNil)
 	c.Assert(id, Equals, "25")
 }

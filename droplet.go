@@ -3,7 +3,6 @@ package digitalocean
 import (
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 type DropletResponse struct {
@@ -126,8 +125,8 @@ func (c *Client) CreateDroplet(opts *CreateDroplet) (string, error) {
 		params["image"] = opts.Image
 	}
 
-	if len(opts.SSHKeys) > 0 {
-		params["ssh_keys[]"] = strings.Join(opts.SSHKeys, ",")
+	for _, v := range opts.SSHKeys {
+		params["ssh_keys[]"] = v
 	}
 
 	if opts.Backups != "" && opts.Backups != "false" {
