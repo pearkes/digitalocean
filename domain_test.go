@@ -19,9 +19,8 @@ func (s *S) Test_CreateDomain(c *C) {
 
 	id, err := s.client.CreateDomain(&opts)
 
-	req := testServer.WaitRequest()
+	_ = testServer.WaitRequest()
 
-	c.Assert(req.Form["name"], DeepEquals, []string{"example.com"})
 	c.Assert(err, IsNil)
 	c.Assert(id, Equals, "example.com")
 }

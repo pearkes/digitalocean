@@ -21,11 +21,8 @@ func (s *S) Test_CreateDroplet(c *C) {
 
 	id, err := s.client.CreateDroplet(&opts)
 
-	req := testServer.WaitRequest()
+	_ = testServer.WaitRequest()
 
-	c.Assert(req.Form["name"], DeepEquals, []string{"foobar"})
-	c.Assert(req.Form["user_data"], DeepEquals, []string{"baz"})
-	c.Assert(req.Form["ssh_keys[]"], DeepEquals, []string{"1"})
 	c.Assert(err, IsNil)
 	c.Assert(id, Equals, "25")
 }
@@ -84,11 +81,9 @@ func (s *S) Test_Resize(c *C) {
 
 	err := s.client.Resize("25", "1gb")
 
-	req := testServer.WaitRequest()
+	_ = testServer.WaitRequest()
 
 	c.Assert(err, IsNil)
-	c.Assert(req.Form["size"], DeepEquals, []string{"1gb"})
-	c.Assert(req.Form["type"], DeepEquals, []string{"resize"})
 }
 
 func (s *S) Test_Rename(c *C) {
@@ -96,11 +91,9 @@ func (s *S) Test_Rename(c *C) {
 
 	err := s.client.Rename("25", "foobar")
 
-	req := testServer.WaitRequest()
+	_ = testServer.WaitRequest()
 
 	c.Assert(err, IsNil)
-	c.Assert(req.Form["name"], DeepEquals, []string{"foobar"})
-	c.Assert(req.Form["type"], DeepEquals, []string{"rename"})
 }
 
 func (s *S) Test_EnableIPV6s(c *C) {
@@ -108,10 +101,9 @@ func (s *S) Test_EnableIPV6s(c *C) {
 
 	err := s.client.EnableIPV6s("25")
 
-	req := testServer.WaitRequest()
+	_ = testServer.WaitRequest()
 
 	c.Assert(err, IsNil)
-	c.Assert(req.Form["type"], DeepEquals, []string{"enable_ipv6"})
 }
 
 func (s *S) Test_EnablePrivateNetworking(c *C) {
@@ -119,10 +111,9 @@ func (s *S) Test_EnablePrivateNetworking(c *C) {
 
 	err := s.client.EnablePrivateNetworking("25")
 
-	req := testServer.WaitRequest()
+	_ = testServer.WaitRequest()
 
 	c.Assert(err, IsNil)
-	c.Assert(req.Form["type"], DeepEquals, []string{"enable_private_networking"})
 }
 
 func (s *S) Test_ActionError(c *C) {
@@ -130,9 +121,8 @@ func (s *S) Test_ActionError(c *C) {
 
 	err := s.client.EnablePrivateNetworking("25")
 
-	req := testServer.WaitRequest()
+	_ = testServer.WaitRequest()
 
-	c.Assert(req.Form["type"], DeepEquals, []string{"enable_private_networking"})
 	c.Assert(err.Error(), Equals, "Error processing droplet action: API Error: unprocessable_entity: You specified an invalid size for Droplet creation.")
 }
 
@@ -141,9 +131,8 @@ func (s *S) Test_PowerOn(c *C) {
 
 	err := s.client.PowerOn("25")
 
-	req := testServer.WaitRequest()
+	_ = testServer.WaitRequest()
 
-	c.Assert(req.Form["type"], DeepEquals, []string{"power_on"})
 	c.Assert(err, IsNil)
 }
 
@@ -152,9 +141,8 @@ func (s *S) Test_PowerOff(c *C) {
 
 	err := s.client.PowerOff("25")
 
-	req := testServer.WaitRequest()
+	_ = testServer.WaitRequest()
 
-	c.Assert(req.Form["type"], DeepEquals, []string{"power_off"})
 	c.Assert(err, IsNil)
 }
 

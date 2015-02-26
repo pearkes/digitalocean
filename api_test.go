@@ -60,25 +60,17 @@ func Test_NewClient_env(t *testing.T) {
 func TestClient_NewRequest(t *testing.T) {
 	c := makeClient(t)
 
-	params := map[string]string{
+	body := map[string]string{
 		"foo": "bar",
 		"baz": "bar",
 	}
-	req, err := c.NewRequest(params, "POST", "/bar")
+
+	req, err := c.NewRequest(body, "POST", "/bar")
 	if err != nil {
 		t.Fatalf("bad: %v", err)
 	}
 
-	encoded := req.URL.Query()
-	if encoded.Get("foo") != "bar" {
-		t.Fatalf("bad: %v", encoded)
-	}
-
-	if encoded.Get("baz") != "bar" {
-		t.Fatalf("bad: %v", encoded)
-	}
-
-	if req.URL.String() != "https://api.digitalocean.com/v2/bar?baz=bar&foo=bar" {
+	if req.URL.String() != "https://api.digitalocean.com/v2/bar" {
 		t.Fatalf("bad base url: %v", req.URL.String())
 	}
 

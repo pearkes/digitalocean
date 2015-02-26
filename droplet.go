@@ -99,53 +99,23 @@ func (d *Droplet) NetworkingType() string {
 // CreateDroplet contains the request parameters to create a new
 // droplet.
 type CreateDroplet struct {
-	Name              string   // Name of the droplet
-	Region            string   // Slug of the region to create the droplet in
-	Size              string   // Slug of the size to use for the droplet
-	Image             string   // Slug of the image, if using a public image
-	SSHKeys           []string // Array of SSH Key IDs that should be added
-	Backups           string   // 'true' or 'false' if backups are enabled
-	IPV6              string   // 'true' or 'false' if IPV6 is enabled
-	PrivateNetworking string   // 'true' or 'false' if Private Networking is enabled
-	UserData          string   // metadata for the droplet
+	Name              string   `json:"name"`               // Name of the droplet
+	Region            string   `json:"region"`             // Slug of the region to create the droplet in
+	Size              string   `json:"size"`               // Slug of the size to use for the droplet
+	Image             string   `json:"image"`              // Slug of the image, if using a public image
+	SSHKeys           []string `json:"ssh_keys"`           // Array of SSH Key IDs that should be added
+	Backups           string   `json:"backups"`            // 'true' or 'false' if backups are enabled
+	IPV6              string   `json:"ipv6"`               // 'true' or 'false' if IPV6 is enabled
+	PrivateNetworking string   `json:"private_networking"` // 'true' or 'false' if Private Networking is enabled
+	UserData          string   `json:"user_data"`          // metadata for the droplet
 }
 
 // CreateDroplet creates a droplet from the parameters specified and
 // returns an error if it fails. If no error and an ID is returned,
 // the Droplet was succesfully created.
 func (c *Client) CreateDroplet(opts *CreateDroplet) (string, error) {
-	// Make the request parameters
-	params := make(map[string]string)
+	req, err := c.NewRequest(opts, "POST", "/droplets")
 
-	params["name"] = opts.Name
-	params["region"] = opts.Region
-	params["size"] = opts.Size
-
-	if opts.Image != "" {
-		params["image"] = opts.Image
-	}
-
-	for _, v := range opts.SSHKeys {
-		params["ssh_keys[]"] = v
-	}
-
-	if opts.Backups != "" && opts.Backups != "false" {
-		params["backups"] = opts.Backups
-	}
-
-	if opts.IPV6 != "" && opts.IPV6 != "false" {
-		params["ipv6"] = opts.IPV6
-	}
-
-	if opts.PrivateNetworking != "" && opts.PrivateNetworking != "false" {
-		params["private_networking"] = opts.PrivateNetworking
-	}
-
-	if opts.UserData != "" {
-		params["user_data"] = opts.UserData
-	}
-
-	req, err := c.NewRequest(params, "POST", "/droplets")
 	if err != nil {
 		return "", err
 	}
@@ -172,7 +142,7 @@ func (c *Client) CreateDroplet(opts *CreateDroplet) (string, error) {
 // returns an error if it fails. If no error is returned,
 // the Droplet was succesfully destroyed.
 func (c *Client) DestroyDroplet(id string) error {
-	req, err := c.NewRequest(map[string]string{}, "DELETE", fmt.Sprintf("/droplets/%s", id))
+	req, err := c.NewRequest(nil, "DELETE", fmt.Sprintf("/droplets/%s", id))
 
 	if err != nil {
 		return err
@@ -192,7 +162,7 @@ func (c *Client) DestroyDroplet(id string) error {
 // returns a Droplet and an error. An error will be returned for failed
 // requests with a nil Droplet.
 func (c *Client) RetrieveDroplet(id string) (Droplet, error) {
-	req, err := c.NewRequest(map[string]string{}, "GET", fmt.Sprintf("/droplets/%s", id))
+	req, err := c.NewRequest(nil, "GET", fmt.Sprintf("/droplets/%s", id))
 
 	if err != nil {
 		return Droplet{}, err
@@ -217,7 +187,7 @@ func (c *Client) RetrieveDroplet(id string) (Droplet, error) {
 
 // Action sends the specified action to the droplet. An error
 // is retunred, and is nil if successful
-func (c *Client) Action(id string, action map[string]string) error {
+func (c *Client) Action(id string, action map[string]interface{}) error {
 	req, err := c.NewRequest(action, "POST", fmt.Sprintf("/droplets/%s/actions", id))
 
 	if err != nil {
@@ -235,7 +205,7 @@ func (c *Client) Action(id string, action map[string]string) error {
 
 // Resizes a droplet to the size slug specified
 func (c *Client) Resize(id string, size string) error {
-	return c.Action(id, map[string]string{
+	return c.Action(id, map[string]interface{}{
 		"type": "resize",
 		"size": size,
 	})
@@ -243,7 +213,7 @@ func (c *Client) Resize(id string, size string) error {
 
 // Renames a droplet to the name specified
 func (c *Client) Rename(id string, name string) error {
-	return c.Action(id, map[string]string{
+	return c.Action(id, map[string]interface{}{
 		"type": "rename",
 		"name": name,
 	})
@@ -251,28 +221,28 @@ func (c *Client) Rename(id string, name string) error {
 
 // Enables IPV6 on the droplet
 func (c *Client) EnableIPV6s(id string) error {
-	return c.Action(id, map[string]string{
+	return c.Action(id, map[string]interface{}{
 		"type": "enable_ipv6",
 	})
 }
 
 // Enables private networking on the droplet
 func (c *Client) EnablePrivateNetworking(id string) error {
-	return c.Action(id, map[string]string{
+	return c.Action(id, map[string]interface{}{
 		"type": "enable_private_networking",
 	})
 }
 
 // Resizes a droplet to the size slug specified
 func (c *Client) PowerOff(id string) error {
-	return c.Action(id, map[string]string{
+	return c.Action(id, map[string]interface{}{
 		"type": "power_off",
 	})
 }
 
 // Resizes a droplet to the size slug specified
 func (c *Client) PowerOn(id string) error {
-	return c.Action(id, map[string]string{
+	return c.Action(id, map[string]interface{}{
 		"type": "power_on",
 	})
 }
