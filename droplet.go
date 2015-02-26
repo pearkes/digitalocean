@@ -201,7 +201,7 @@ func (c *Client) RetrieveDroplet(id string) (Droplet, error) {
 
 	resp, err := checkResp(c.Http.Do(req))
 	if err != nil {
-		return Droplet{}, fmt.Errorf("Error destroying droplet: %s", err)
+		return Droplet{}, fmt.Errorf("Error retrieving droplet: %s", err)
 	}
 
 	droplet := new(DropletResponse)
