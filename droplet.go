@@ -108,9 +108,9 @@ type CreateDroplet struct {
 	Size              string   `json:"size,omitempty"`               // Slug of the size to use for the droplet
 	Image             string   `json:"image,omitempty"`              // Slug of the image, if using a public image
 	SSHKeys           []string `json:"ssh_keys,omitempty"`           // Array of SSH Key IDs that should be added
-	Backups           string   `json:"backups,omitempty"`            // 'true' or 'false' if backups are enabled
-	IPV6              string   `json:"ipv6,omitempty"`               // 'true' or 'false' if IPV6 is enabled
-	PrivateNetworking string   `json:"private_networking,omitempty"` // 'true' or 'false' if Private Networking is enabled
+	Backups           bool     `json:"backups,omitempty"`            // true or false if backups are enabled
+	IPV6              bool     `json:"ipv6,omitempty"`               // true or false if IPV6 is enabled
+	PrivateNetworking bool     `json:"private_networking,omitempty"` // true or false if Private Networking is enabled
 	UserData          string   `json:"user_data,omitempty"`          // metadata for the droplet
 }
 
