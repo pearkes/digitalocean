@@ -5,6 +5,10 @@ import (
 	"strconv"
 )
 
+type DropletsResponse struct {
+	Droplets []Droplet `json:"droplets"`
+}
+
 type DropletResponse struct {
 	Droplet Droplet `json:"droplet"`
 }
@@ -188,6 +192,32 @@ func (c *Client) DestroyDroplet(id string) error {
 	return nil
 }
 
+// RetrieveDroplets gets the list of Droplets and an error. An error will
+// be returned for failed requests with a nil slice.
+func (c *Client) RetrieveDroplets() ([]Droplet, error) {
+	req, err := c.NewRequest(map[string]string{}, "GET", "/droplets")
+
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := checkResp(c.Http.Do(req))
+	if err != nil {
+		return nil, fmt.Errorf("Error retrieving droplets: %s", err)
+	}
+
+	droplets := new(DropletsResponse)
+
+	err = decodeBody(resp, droplets)
+
+	if err != nil {
+		return nil, fmt.Errorf("Error decoding droplet response: %s", err)
+	}
+
+	// The request was successful
+	return droplets.Droplets, nil
+}
+
 // RetrieveDroplet gets  a droplet by the ID specified and
 // returns a Droplet and an error. An error will be returned for failed
 // requests with a nil Droplet.
@@ -200,7 +230,7 @@ func (c *Client) RetrieveDroplet(id string) (Droplet, error) {
 
 	resp, err := checkResp(c.Http.Do(req))
 	if err != nil {
-		return Droplet{}, fmt.Errorf("Error destroying droplet: %s", err)
+		return Droplet{}, fmt.Errorf("Error retrieving droplet: %s", err)
 	}
 
 	droplet := new(DropletResponse)
