@@ -1,8 +1,10 @@
 package digitalocean
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -48,24 +50,21 @@ func NewClient(token string) (*Client, error) {
 }
 
 // Creates a new request with the params
-func (c *Client) NewRequest(params map[string]string, method string, endpoint string) (*http.Request, error) {
-	p := url.Values{}
+func (c *Client) NewRequest(body interface{}, method string, endpoint string) (*http.Request, error) {
 	u, err := url.Parse(c.URL + endpoint)
 
 	if err != nil {
 		return nil, fmt.Errorf("Error parsing base URL: %s", err)
 	}
 
-	// Build up our request parameters
-	for k, v := range params {
-		p.Add(k, v)
+	rBody, err := encodeBody(body)
+
+	if err != nil {
+		return nil, fmt.Errorf("Error encoding request body: %s", err)
 	}
 
-	// Add the params to our URL
-	u.RawQuery = p.Encode()
-
 	// Build the request
-	req, err := http.NewRequest(method, u.String(), nil)
+	req, err := http.NewRequest(method, u.String(), rBody)
 
 	if err != nil {
 		return nil, fmt.Errorf("Error creating request: %s", err)
@@ -73,9 +72,25 @@ func (c *Client) NewRequest(params map[string]string, method string, endpoint st
 
 	// Add the authorization header
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", c.Token))
+	req.Header.Add("Accept", "application/json")
+
+	// If it's a not a get, add a content-type
+	if method != "GET" {
+		req.Header.Add("Content-Type", "application/json")
+	}
 
 	return req, nil
 
+}
+
+// Encodes a body into JSON
+func encodeBody(obj interface{}) (io.Reader, error) {
+	buf := bytes.NewBuffer(nil)
+	enc := json.NewEncoder(buf)
+	if err := enc.Encode(obj); err != nil {
+		return nil, err
+	}
+	return buf, nil
 }
 
 // parseErr is used to take an error json resp
