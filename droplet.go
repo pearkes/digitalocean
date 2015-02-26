@@ -99,15 +99,15 @@ func (d *Droplet) NetworkingType() string {
 // CreateDroplet contains the request parameters to create a new
 // droplet.
 type CreateDroplet struct {
-	Name              string   `json:"name"`               // Name of the droplet
-	Region            string   `json:"region"`             // Slug of the region to create the droplet in
-	Size              string   `json:"size"`               // Slug of the size to use for the droplet
-	Image             string   `json:"image"`              // Slug of the image, if using a public image
-	SSHKeys           []string `json:"ssh_keys"`           // Array of SSH Key IDs that should be added
-	Backups           string   `json:"backups"`            // 'true' or 'false' if backups are enabled
-	IPV6              string   `json:"ipv6"`               // 'true' or 'false' if IPV6 is enabled
-	PrivateNetworking string   `json:"private_networking"` // 'true' or 'false' if Private Networking is enabled
-	UserData          string   `json:"user_data"`          // metadata for the droplet
+	Name              string   `json:"name,omitempty"`               // Name of the droplet
+	Region            string   `json:"region,omitempty"`             // Slug of the region to create the droplet in
+	Size              string   `json:"size,omitempty"`               // Slug of the size to use for the droplet
+	Image             string   `json:"image,omitempty"`              // Slug of the image, if using a public image
+	SSHKeys           []string `json:"ssh_keys,omitempty"`           // Array of SSH Key IDs that should be added
+	Backups           string   `json:"backups,omitempty"`            // 'true' or 'false' if backups are enabled
+	IPV6              string   `json:"ipv6,omitempty"`               // 'true' or 'false' if IPV6 is enabled
+	PrivateNetworking string   `json:"private_networking,omitempty"` // 'true' or 'false' if Private Networking is enabled
+	UserData          string   `json:"user_data,omitempty"`          // metadata for the droplet
 }
 
 // CreateDroplet creates a droplet from the parameters specified and
